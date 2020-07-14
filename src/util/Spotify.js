@@ -2,7 +2,7 @@
 require('dotenv').config();
 
 const clientId = process.env.REACT_APP_API_KEY;
-const redirectUri = 'http://localhost:3000/';
+const redirectUri = 'http://localhost:3000/callback/';
 
 let accessToken;
 
@@ -27,8 +27,7 @@ const Spotify = {
             return accessToken;
         }
         else {
-            const accessUrl = `https://accounts.spotify.com/authorize?
-            client_id=${clientId}&response_type=token&scope=playlist-modify-public&redirect_uri=${redirectUri}`;
+            const accessUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&scope=playlist-modify-public&redirect_uri=${redirectUri}`;
 
             window.location = accessUrl;
         }
@@ -47,17 +46,17 @@ const Spotify = {
                 if (!jsonResponse.tracks) {
                     return [];
                 }
-                else {
-                    return jsonResponse.tracks.items.map(track => ({
 
-                        id: track.id,
-                        name: track.name,
-                        artist: track.artists[0].name,
-                        album: track.album.name,
-                        uri: track.uri,
+                return jsonResponse.tracks.items.map(track => ({
 
-                    }));
-                }
+                    id: track.id,
+                    name: track.name,
+                    artist: track.artists[0].name,
+                    album: track.album.name,
+                    uri: track.uri,
+
+                }));
+
             });
     },
 
@@ -79,7 +78,7 @@ const Spotify = {
                     headers: headers,
                     method: 'POST',
                     body: JSON.stringify({ name: name })
-                }).then(response => response.json() 
+                }).then(response => response.json()
                 ).then(jsonResponse => {
                     const playlistId = jsonResponse.id;
                     return fetch(`https://api.spotify.com/v1/users/${userId}/playlists/${playlistId}/tracks`,
@@ -87,11 +86,11 @@ const Spotify = {
                             headers: headers,
                             method: 'POST',
                             body: JSON.stringify({ uris: trackUris })
-                        })
-                })
-        })
+                        });
+                });
+        });
     }
 
-}
+};
 
 export default Spotify;
